@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Story Dish Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bee6c",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface": "#1a2e20",
+                        "neutral-green": "#23482f",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .marble-bg {
+            background-color: #102216;
+            background-image: radial-gradient(circle at 2px 2px, rgba(43, 238, 108, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden marble-bg">
+<!-- Header -->
+<div class="flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-10 p-4 pb-2 justify-between border-b border-neutral-green/30">
+<div class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">AI Story Dish</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="text-slate-900 dark:text-slate-100 hover:text-primary">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<main class="flex-1 px-4 py-6 space-y-6">
+<!-- Status Message -->
+<div class="text-center space-y-1">
+<h4 class="text-primary text-sm font-bold uppercase tracking-widest">Bon Appétit!</h4>
+<p class="text-slate-600 dark:text-slate-400 text-sm">Your story has been cooked to perfection.</p>
+</div>
+<!-- Stylized Bento Box / Plate -->
+<div class="bg-neutral-green/20 border border-neutral-green/40 rounded-3xl p-4 shadow-2xl relative overflow-hidden">
+<!-- Inner Bento Grid -->
+<div class="grid grid-cols-2 gap-3 h-full">
+<!-- Main Course (The Plot) -->
+<div class="col-span-2 bg-surface border border-primary/20 rounded-2xl p-5 shadow-inner">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-xl">restaurant_menu</span>
+<h3 class="font-bold text-primary tracking-tight">The Protagonist's Journey</h3>
+</div>
+<p class="text-slate-200 text-base leading-relaxed italic mb-4">
+                            "In a world where memories are traded like spices, a young chef discovers a flavor that can rewrite history."
+                        </p>
+<div class="space-y-3 border-t border-neutral-green pt-3">
+<div class="flex gap-3">
+<span class="text-primary font-bold text-xs mt-1">01</span>
+<p class="text-sm text-slate-300">The discovery of the Forbidden Saffron in a dusty pantry.</p>
+</div>
+<div class="flex gap-3">
+<span class="text-primary font-bold text-xs mt-1">02</span>
+<p class="text-sm text-slate-300">A bitter betrayal by the Head Sommelier of Time.</p>
+</div>
+<div class="flex gap-3">
+<span class="text-primary font-bold text-xs mt-1">03</span>
+<p class="text-sm text-slate-300">A sweet resolution that restores the world's palate.</p>
+</div>
+</div>
+</div>
+<!-- Side Dish 1 (Setting) -->
+<div class="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary/70 text-lg">location_on</span>
+<span class="text-xs font-bold uppercase text-primary/70">Atmosphere</span>
+</div>
+<p class="text-xs text-slate-400 leading-tight">Neon-lit bistros and steam-filled alleyways of Neo-Paris.</p>
+</div>
+<!-- Side Dish 2 (Twist) -->
+<div class="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary/70 text-lg">auto_fix_high</span>
+<span class="text-xs font-bold uppercase text-primary/70">Secret Sauce</span>
+</div>
+<p class="text-xs text-slate-400 leading-tight">The main character is actually a ghost haunting the kitchen.</p>
+</div>
+</div>
+</div>
+<!-- The Ingredient Receipt/Menu Card -->
+<div class="relative max-w-[280px] mx-auto">
+<div class="bg-white text-slate-800 p-6 shadow-xl transform rotate-1 rounded-sm border-t-4 border-dashed border-slate-300">
+<div class="text-center mb-4">
+<p class="text-[10px] font-bold tracking-tighter uppercase border-b border-slate-200 pb-1">Ingredient Receipt</p>
+</div>
+<ul class="text-[11px] font-mono space-y-2">
+<li class="flex justify-between"><span>[WORD] BITTERNESS</span> <span>x1</span></li>
+<li class="flex justify-between"><span>[PHRASE] LAST SUPPER</span> <span>x1</span></li>
+<li class="flex justify-between"><span>[ADJ] EBULLIENT</span> <span>x2</span></li>
+<li class="flex justify-between"><span>[NOUN] COPPER POT</span> <span>x1</span></li>
+</ul>
+<div class="mt-4 pt-2 border-t border-dotted border-slate-400 flex justify-between font-bold">
+<span>TOTAL COMPLEXITY</span>
+<span>8.5/10</span>
+</div>
+<div class="mt-4 flex justify-center">
+<div class="w-full h-8 bg-slate-100 flex items-center justify-center opacity-50 overflow-hidden">
+<span class="text-[8px] tracking-[4px] uppercase">|||||||||||||||||||||</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Action Icons -->
+<div class="grid grid-cols-3 gap-4 pt-4">
+<button class="flex flex-col items-center gap-2 group">
+<div class="size-14 rounded-full bg-primary flex items-center justify-center text-background-dark shadow-lg shadow-primary/20 group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<span class="text-xs font-bold text-slate-600 dark:text-slate-400">Save To Cookbook</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="size-14 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined">ink_pen</span>
+</div>
+<span class="text-xs font-bold text-slate-600 dark:text-slate-400">Garnish (Edit)</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="size-14 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined">refresh</span>
+</div>
+<span class="text-xs font-bold text-slate-600 dark:text-slate-400">Re-cook</span>
+</button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="flex gap-2 border-t border-neutral-green/50 bg-background-dark px-4 pb-8 pt-2 sticky bottom-0 z-20">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">kitchen</span>
+</div>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Kitchen</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">ac_unit</span>
+</div>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Pantry</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Served</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Cookbook</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Chef</p>
+</a>
+</nav>
+</div>
+</body></html>

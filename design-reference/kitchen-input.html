@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kitchen Dashboard Input</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bee6c",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "fridge-silver": "#e2e8f0",
+                        "fridge-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .fridge-texture {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased h-screen flex flex-col overflow-hidden">
+<div class="flex-1 flex flex-col max-w-md mx-auto w-full bg-slate-50 dark:bg-slate-900 relative shadow-2xl overflow-y-auto pb-24">
+<header class="sticky top-0 z-20 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">cooking</span>
+</div>
+<div>
+<h1 class="text-lg font-extrabold tracking-tight">Kitchen Dashboard</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Smart Refrigerator OS v2.0</p>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="p-4 space-y-6">
+<section class="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden fridge-texture">
+<div class="bg-slate-100 dark:bg-slate-700/50 p-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">inventory_2</span>
+<h2 class="font-bold text-sm">Pantry Ingredients</h2>
+</div>
+<span class="text-[10px] font-bold bg-primary/20 text-primary px-2 py-0.5 rounded-full">6 ITEMS</span>
+</div>
+<div class="p-3 flex flex-wrap gap-2">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+<p class="text-xs font-semibold leading-normal">Dark Forest</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm text-primary">vpn_key</span>
+<p class="text-xs font-semibold leading-normal">Mystery Key</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm text-primary">person</span>
+<p class="text-xs font-semibold leading-normal">Silent Protagonist</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm text-primary">dark_mode</span>
+<p class="text-xs font-semibold leading-normal">Moonlight</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm text-primary">map</span>
+<p class="text-xs font-semibold leading-normal">Old Map</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 px-3 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm text-primary">swords</span>
+<p class="text-xs font-semibold leading-normal">Betrayal</p>
+</div>
+<button class="flex h-8 items-center justify-center gap-x-2 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 px-3 hover:border-primary transition-colors text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined text-sm">add</span>
+<p class="text-xs font-bold">New Ingredient</p>
+</button>
+</div>
+</section>
+<section class="space-y-3">
+<div class="flex items-center justify-between px-1">
+<h2 class="text-lg font-bold tracking-tight">Recipe Input</h2>
+<span class="material-symbols-outlined text-slate-400">restaurant_menu</span>
+</div>
+<div class="relative group">
+<div class="absolute -top-4 left-4 z-10 bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-t-lg border-t border-l border-r border-slate-300 dark:border-slate-600">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">Mixing Bowl</span>
+</div>
+<div class="rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-inner p-6 pt-8 min-h-[220px] flex flex-col fridge-texture">
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 text-lg font-medium placeholder:text-slate-300 dark:placeholder:text-slate-600 resize-none p-0" placeholder="Type your main plot sentence here... Let's start cooking a new world."></textarea>
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center border-2 border-white dark:border-slate-800">
+<span class="material-symbols-outlined text-xs text-blue-600 dark:text-blue-300">style</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center border-2 border-white dark:border-slate-800">
+<span class="material-symbols-outlined text-xs text-purple-600 dark:text-purple-300">mood</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">DASH OF CREATIVITY ADDED</span>
+</div>
+</div>
+</div>
+</section>
+<div class="flex items-center justify-center py-4">
+<button class="group relative flex flex-col items-center justify-center gap-2">
+<div class="w-24 h-24 bg-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center text-slate-900 transition-transform active:scale-95 hover:scale-105 border-4 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-5xl font-light">chef_hat</span>
+</div>
+<div class="bg-primary px-4 py-1.5 rounded-full shadow-md -mt-4 z-10 border-2 border-white dark:border-slate-900">
+<span class="text-xs font-black uppercase tracking-widest text-slate-900">Cook with AI</span>
+</div>
+<div class="absolute -bottom-8 w-full text-center">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Estimated Time: 15 Seconds</p>
+</div>
+</button>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30">
+<div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl px-4 pb-8 pt-3">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined fill-1">kitchen</span>
+</div>
+<p class="text-[10px] font-bold leading-normal tracking-wider uppercase">Kitchen</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<p class="text-[10px] font-bold leading-normal tracking-wider uppercase">Pantry</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<p class="text-[10px] font-bold leading-normal tracking-wider uppercase">Cookbook</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</div>
+<p class="text-[10px] font-bold leading-normal tracking-wider uppercase">Chef</p>
+</a>
+</div>
+</nav>
+<div class="absolute top-0 right-0 p-4 pointer-events-none opacity-20">
+<div class="w-32 h-32 bg-primary blur-3xl rounded-full"></div>
+</div>
+<div class="absolute bottom-40 left-0 p-4 pointer-events-none opacity-10">
+<div class="w-48 h-48 bg-primary blur-3xl rounded-full"></div>
+</div>
+</div>
+</body></html>

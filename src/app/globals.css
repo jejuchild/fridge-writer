@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #2bee6c;
+  --color-background-light: #f6f8f6;
+  --color-background-dark: #102216;
+  --color-surface: #1a2e20;
+  --color-neutral-green: #23482f;
+  --color-fridge-silver: #e2e8f0;
+  --color-fridge-dark: #1e293b;
+  --font-display: var(--font-manrope, "Manrope", sans-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fridge-texture {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+.marble-bg {
+  background-color: #102216;
+  background-image: radial-gradient(
+    circle at 2px 2px,
+    rgba(43, 238, 108, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 1.5s linear infinite;
 }
