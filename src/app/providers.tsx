@@ -9,32 +9,72 @@ import {
   type ReactNode,
 } from "react";
 
+// ── Types ──
+
 export interface Ingredient {
   id: string;
   text: string;
   icon: string;
 }
 
+export type CookMode = "prep" | "mealkit" | "fullcook";
+
 export interface CookResult {
+  mode: CookMode;
   title: string;
-  premise: string;
-  plotPoints: string[];
-  atmosphere: string;
-  secretSauce: string;
+  premise?: string;
+  keywords?: string[];
+  plotPoints?: string[];
+  atmosphere?: string;
+  secretSauce?: string;
+  synopsis?: string;
   complexity: number;
 }
 
+export interface Memo {
+  id: string;
+  text: string;
+  createdAt: number;
+}
+
+export interface CookbookEntry {
+  id: string;
+  result: CookResult;
+  ingredients: Ingredient[];
+  prompt: string;
+  createdAt: number;
+}
+
 interface AppContextType {
+  // Ingredients (kitchen)
   ingredients: Ingredient[];
   addIngredient: (text: string) => void;
   removeIngredient: (id: string) => void;
+  // Prompt (kitchen)
   prompt: string;
   setPrompt: (val: string) => void;
+  // Cook mode
+  cookMode: CookMode;
+  setCookMode: (mode: CookMode) => void;
+  // Cook result
   cookResult: CookResult | null;
   setCookResult: (result: CookResult | null) => void;
+  // Loading
   isLoading: boolean;
   setIsLoading: (val: boolean) => void;
+  // Memos (pantry)
+  memos: Memo[];
+  addMemo: (text: string) => void;
+  removeMemo: (id: string) => void;
+  updateMemo: (id: string, text: string) => void;
+  useAsIngredient: (memo: Memo) => void;
+  // Cookbook
+  cookbook: CookbookEntry[];
+  addToCookbook: () => void;
+  removeFromCookbook: (id: string) => void;
 }
+
+// ── Constants ──
 
 const ICONS = [
   "auto_awesome",
@@ -57,45 +97,78 @@ const DEFAULT_INGREDIENTS: Ingredient[] = [
   { id: "default-3", text: "말없는 주인공", icon: "person" },
 ];
 
+// ── Helpers ──
+
+function readLS<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      const parsed: unknown = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed as T;
+      return parsed as T;
+    }
+  } catch {
+    // Invalid localStorage data
+  }
+  return fallback;
+}
+
+function writeLS(key: string, value: unknown) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+// ── Context ──
+
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  // Kitchen state
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
-    if (typeof window === "undefined") return DEFAULT_INGREDIENTS;
-    try {
-      const saved = localStorage.getItem("fridge-writer-ingredients");
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0)
-          return parsed as Ingredient[];
-      }
-    } catch {
-      // Invalid localStorage data
-    }
-    return DEFAULT_INGREDIENTS;
+    const saved = readLS<Ingredient[]>("fridge-writer-ingredients", []);
+    return saved.length > 0 ? saved : DEFAULT_INGREDIENTS;
   });
-  const [prompt, setPromptState] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      return localStorage.getItem("fridge-writer-prompt") || "";
-    } catch {
-      return "";
-    }
-  });
+  const [prompt, setPromptState] = useState<string>(() =>
+    readLS<string>("fridge-writer-prompt", "")
+  );
+  const [cookMode, setCookModeState] = useState<CookMode>(() =>
+    readLS<CookMode>("fridge-writer-cookmode", "mealkit")
+  );
   const [cookResult, setCookResult] = useState<CookResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Pantry memos
+  const [memos, setMemos] = useState<Memo[]>(() =>
+    readLS<Memo[]>("fridge-writer-memos", [])
+  );
+
+  // Cookbook
+  const [cookbook, setCookbook] = useState<CookbookEntry[]>(() =>
+    readLS<CookbookEntry[]>("fridge-writer-cookbook", [])
+  );
+
+  // ── Persistence ──
   useEffect(() => {
-    localStorage.setItem(
-      "fridge-writer-ingredients",
-      JSON.stringify(ingredients)
-    );
+    writeLS("fridge-writer-ingredients", ingredients);
   }, [ingredients]);
 
   useEffect(() => {
-    localStorage.setItem("fridge-writer-prompt", prompt);
+    writeLS("fridge-writer-prompt", prompt);
   }, [prompt]);
 
+  useEffect(() => {
+    writeLS("fridge-writer-cookmode", cookMode);
+  }, [cookMode]);
+
+  useEffect(() => {
+    writeLS("fridge-writer-memos", memos);
+  }, [memos]);
+
+  useEffect(() => {
+    writeLS("fridge-writer-cookbook", cookbook);
+  }, [cookbook]);
+
+  // ── Ingredient actions ──
   const addIngredient = useCallback((text: string) => {
     const icon = ICONS[Math.floor(Math.random() * ICONS.length)];
     setIngredients((prev) => [
@@ -112,6 +185,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setPromptState(val);
   }, []);
 
+  const setCookMode = useCallback((mode: CookMode) => {
+    setCookModeState(mode);
+  }, []);
+
+  // ── Memo actions ──
+  const addMemo = useCallback((text: string) => {
+    setMemos((prev) => [
+      { id: Date.now().toString(), text, createdAt: Date.now() },
+      ...prev,
+    ]);
+  }, []);
+
+  const removeMemo = useCallback((id: string) => {
+    setMemos((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
+  const updateMemo = useCallback((id: string, text: string) => {
+    setMemos((prev) => prev.map((m) => (m.id === id ? { ...m, text } : m)));
+  }, []);
+
+  const useAsIngredient = useCallback((memo: Memo) => {
+    const icon = ICONS[Math.floor(Math.random() * ICONS.length)];
+    setIngredients((prev) => [
+      ...prev,
+      { id: `memo-${memo.id}-${Date.now()}`, text: memo.text, icon },
+    ]);
+  }, []);
+
+  // ── Cookbook actions ──
+  const addToCookbook = useCallback(() => {
+    setCookResult((currentResult) => {
+      if (!currentResult) return currentResult;
+      setCookbook((prev) => [
+        {
+          id: Date.now().toString(),
+          result: currentResult,
+          ingredients: ingredients,
+          prompt: prompt,
+          createdAt: Date.now(),
+        },
+        ...prev,
+      ]);
+      return currentResult;
+    });
+  }, [ingredients, prompt]);
+
+  const removeFromCookbook = useCallback((id: string) => {
+    setCookbook((prev) => prev.filter((e) => e.id !== id));
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -120,10 +243,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         removeIngredient,
         prompt,
         setPrompt,
+        cookMode,
+        setCookMode,
         cookResult,
         setCookResult,
         isLoading,
         setIsLoading,
+        memos,
+        addMemo,
+        removeMemo,
+        updateMemo,
+        useAsIngredient,
+        cookbook,
+        addToCookbook,
+        removeFromCookbook,
       }}
     >
       {children}

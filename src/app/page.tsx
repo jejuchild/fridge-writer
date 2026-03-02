@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useApp } from "./providers";
+import { useApp, type CookMode } from "./providers";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import BottomNav from "./components/BottomNav";
+
+const COOK_MODES: { mode: CookMode; icon: string; label: string }[] = [
+  { mode: "prep", icon: "content_cut", label: "재료 손질" },
+  { mode: "mealkit", icon: "package_2", label: "밀키트" },
+  { mode: "fullcook", icon: "skillet", label: "요리" },
+];
 
 export default function KitchenPage() {
   const {
@@ -12,6 +19,8 @@ export default function KitchenPage() {
     removeIngredient,
     prompt,
     setPrompt,
+    cookMode,
+    setCookMode,
     setCookResult,
     isLoading,
     setIsLoading,
@@ -50,6 +59,7 @@ export default function KitchenPage() {
         body: JSON.stringify({
           ingredients: ingredients.map((i) => i.text),
           prompt,
+          mode: cookMode,
         }),
       });
 
@@ -92,9 +102,12 @@ export default function KitchenPage() {
               </p>
             </div>
           </div>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-800 transition-colors">
+          <Link
+            href="/chef"
+            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-800 transition-colors"
+          >
             <span className="material-symbols-outlined">settings</span>
-          </button>
+          </Link>
         </header>
 
         <main className="p-4 space-y-6">
@@ -172,6 +185,37 @@ export default function KitchenPage() {
                   <p className="text-xs font-bold">새 재료 추가</p>
                 </button>
               )}
+            </div>
+          </section>
+
+          {/* ── Cooking Mode Selector ── */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 px-1">
+              <span className="material-symbols-outlined text-primary text-lg">
+                restaurant_menu
+              </span>
+              <h2 className="text-sm font-bold">요리 방식</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {COOK_MODES.map(({ mode, icon, label }) => {
+                const isActive = cookMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => setCookMode(mode)}
+                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all ${
+                      isActive
+                        ? "bg-primary text-slate-900 shadow-lg shadow-primary/20"
+                        : "bg-slate-800 border border-slate-700 text-slate-400 hover:border-slate-600"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-xl">
+                      {icon}
+                    </span>
+                    <span className="text-[11px] font-bold">{label}</span>
+                  </button>
+                );
+              })}
             </div>
           </section>
 
@@ -266,60 +310,7 @@ export default function KitchenPage() {
         </div>
       </div>
 
-      {/* ── Bottom Nav ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30">
-        <div className="max-w-md mx-auto flex gap-2 border-t border-slate-800 bg-slate-900/90 backdrop-blur-xl px-4 pb-8 pt-3">
-          <Link
-            className="flex flex-1 flex-col items-center justify-center gap-1 text-primary"
-            href="/"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                kitchen
-              </span>
-            </div>
-            <p className="text-[10px] font-bold leading-normal tracking-wider uppercase">
-              주방
-            </p>
-          </Link>
-          <a
-            className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">inventory_2</span>
-            </div>
-            <p className="text-[10px] font-bold leading-normal tracking-wider uppercase">
-              식료품
-            </p>
-          </a>
-          <a
-            className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">menu_book</span>
-            </div>
-            <p className="text-[10px] font-bold leading-normal tracking-wider uppercase">
-              요리책
-            </p>
-          </a>
-          <a
-            className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">account_circle</span>
-            </div>
-            <p className="text-[10px] font-bold leading-normal tracking-wider uppercase">
-              셰프
-            </p>
-          </a>
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

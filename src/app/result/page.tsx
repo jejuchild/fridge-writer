@@ -1,13 +1,17 @@
 "use client";
 
 import { useApp } from "../providers";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import BottomNav from "../components/BottomNav";
 
 export default function ResultPage() {
-  const { cookResult, ingredients } = useApp();
+  const { cookResult, ingredients, addToCookbook, setCookResult } = useApp();
   const router = useRouter();
+  const [saved, setSaved] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!cookResult) {
@@ -16,6 +20,46 @@ export default function ResultPage() {
   }, [cookResult, router]);
 
   if (!cookResult) return null;
+
+  const mode = cookResult.mode || "mealkit";
+
+  const handleSave = () => {
+    addToCookbook();
+    setSaved(true);
+  };
+
+  const handleEdit = () => {
+    if (mode === "fullcook") {
+      setEditText(cookResult.synopsis || "");
+    } else {
+      setEditText(cookResult.premise || "");
+    }
+    setEditing(true);
+  };
+
+  const handleEditSave = () => {
+    if (mode === "fullcook") {
+      setCookResult({ ...cookResult, synopsis: editText });
+    } else {
+      setCookResult({ ...cookResult, premise: editText });
+    }
+    setEditing(false);
+  };
+
+  const handleShare = async () => {
+    const shareText = `${cookResult.title}\n\n${cookResult.premise || cookResult.synopsis || ""}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: cookResult.title, text: shareText });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      // User cancelled share
+    }
+  };
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden marble-bg">
@@ -31,8 +75,13 @@ export default function ResultPage() {
           AI 스토리 요리
         </h2>
         <div className="flex w-10 items-center justify-end">
-          <button className="text-slate-100 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined">share</span>
+          <button
+            onClick={handleShare}
+            className="text-slate-100 hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">
+              {copied ? "check" : "share"}
+            </span>
           </button>
         </div>
       </div>
@@ -48,65 +97,196 @@ export default function ResultPage() {
           </p>
         </div>
 
-        {/* ── Bento Box ── */}
-        <div className="bg-neutral-green/20 border border-neutral-green/40 rounded-3xl p-4 shadow-2xl relative overflow-hidden">
-          <div className="grid grid-cols-2 gap-3">
-            {/* Main Course */}
-            <div className="col-span-2 bg-surface border border-primary/20 rounded-2xl p-5 shadow-inner">
+        {/* ── Mode Badge ── */}
+        <div className="flex justify-center">
+          <span className="text-[10px] font-bold bg-primary/20 text-primary px-3 py-1 rounded-full">
+            {mode === "prep" && "재료 손질"}
+            {mode === "mealkit" && "밀키트"}
+            {mode === "fullcook" && "요리"}
+          </span>
+        </div>
+
+        {/* ── PREP Layout ── */}
+        {mode === "prep" && (
+          <div className="bg-neutral-green/20 border border-neutral-green/40 rounded-3xl p-4 shadow-2xl relative overflow-hidden space-y-4">
+            {/* Title & Premise */}
+            <div className="bg-surface border border-primary/20 rounded-2xl p-5 shadow-inner">
               <div className="flex items-center gap-2 mb-3">
                 <span className="material-symbols-outlined text-primary text-xl">
-                  restaurant_menu
+                  content_cut
                 </span>
                 <h3 className="font-bold text-primary tracking-tight">
                   {cookResult.title}
                 </h3>
               </div>
-              <p className="text-slate-200 text-base leading-relaxed italic mb-4">
+              <p className="text-slate-200 text-base leading-relaxed italic">
                 &ldquo;{cookResult.premise}&rdquo;
               </p>
-              <div className="space-y-3 border-t border-neutral-green pt-3">
-                {cookResult.plotPoints.map((point, i) => (
-                  <div key={i} className="flex gap-3">
-                    <span className="text-primary font-bold text-xs mt-1">
-                      {String(i + 1).padStart(2, "0")}
+            </div>
+
+            {/* Keywords */}
+            {cookResult.keywords && cookResult.keywords.length > 0 && (
+              <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="material-symbols-outlined text-primary/70 text-lg">
+                    label
+                  </span>
+                  <span className="text-xs font-bold uppercase text-primary/70">
+                    키워드
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {cookResult.keywords.map((kw, i) => (
+                    <span
+                      key={i}
+                      className="text-xs bg-slate-700/80 text-slate-200 px-3 py-1 rounded-full border border-slate-600"
+                    >
+                      {kw}
                     </span>
-                    <p className="text-sm text-slate-300">{point}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Twist */}
+            {cookResult.secretSauce && (
+              <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-primary/70 text-lg">
+                    auto_fix_high
+                  </span>
+                  <span className="text-xs font-bold uppercase text-primary/70">
+                    반전
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 leading-tight">
+                  {cookResult.secretSauce}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── MEALKIT Layout (existing bento) ── */}
+        {(!cookResult.mode || mode === "mealkit") && (
+          <div className="bg-neutral-green/20 border border-neutral-green/40 rounded-3xl p-4 shadow-2xl relative overflow-hidden">
+            <div className="grid grid-cols-2 gap-3">
+              {/* Main Course */}
+              <div className="col-span-2 bg-surface border border-primary/20 rounded-2xl p-5 shadow-inner">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="material-symbols-outlined text-primary text-xl">
+                    restaurant_menu
+                  </span>
+                  <h3 className="font-bold text-primary tracking-tight">
+                    {cookResult.title}
+                  </h3>
+                </div>
+                <p className="text-slate-200 text-base leading-relaxed italic mb-4">
+                  &ldquo;{cookResult.premise}&rdquo;
+                </p>
+                {cookResult.plotPoints && (
+                  <div className="space-y-3 border-t border-neutral-green pt-3">
+                    {cookResult.plotPoints.map((point, i) => (
+                      <div key={i} className="flex gap-3">
+                        <span className="text-primary font-bold text-xs mt-1">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p className="text-sm text-slate-300">{point}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            </div>
 
-            {/* Atmosphere */}
-            <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-primary/70 text-lg">
-                  location_on
-                </span>
-                <span className="text-xs font-bold uppercase text-primary/70">
-                  분위기
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 leading-tight">
-                {cookResult.atmosphere}
-              </p>
-            </div>
+              {/* Atmosphere */}
+              {cookResult.atmosphere && (
+                <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-primary/70 text-lg">
+                      location_on
+                    </span>
+                    <span className="text-xs font-bold uppercase text-primary/70">
+                      분위기
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-tight">
+                    {cookResult.atmosphere}
+                  </p>
+                </div>
+              )}
 
-            {/* Secret Sauce */}
-            <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-primary/70 text-lg">
-                  auto_fix_high
+              {/* Secret Sauce */}
+              {cookResult.secretSauce && (
+                <div className="bg-surface/60 border border-neutral-green/50 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-primary/70 text-lg">
+                      auto_fix_high
+                    </span>
+                    <span className="text-xs font-bold uppercase text-primary/70">
+                      비밀 소스
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-tight">
+                    {cookResult.secretSauce}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── FULLCOOK Layout ── */}
+        {mode === "fullcook" && (
+          <div className="bg-neutral-green/20 border border-neutral-green/40 rounded-3xl p-4 shadow-2xl relative overflow-hidden">
+            <div className="bg-surface border border-primary/20 rounded-2xl p-5 shadow-inner">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-primary text-xl">
+                  skillet
                 </span>
-                <span className="text-xs font-bold uppercase text-primary/70">
-                  비밀 소스
-                </span>
+                <h3 className="font-bold text-primary tracking-tight text-lg">
+                  {cookResult.title}
+                </h3>
               </div>
-              <p className="text-xs text-slate-400 leading-tight">
-                {cookResult.secretSauce}
+              <p className="text-slate-200 text-base leading-relaxed whitespace-pre-wrap">
+                {cookResult.synopsis}
               </p>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* ── Edit Section ── */}
+        {editing && (
+          <div className="bg-slate-800 border border-primary/30 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-lg">
+                ink_pen
+              </span>
+              <span className="text-sm font-bold text-slate-200">
+                가니쉬 편집
+              </span>
+            </div>
+            <textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="w-full bg-slate-700 rounded-lg border border-slate-600 p-3 text-sm text-slate-100 focus:outline-none focus:border-primary resize-none min-h-[120px]"
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setEditing(false)}
+                className="text-xs text-slate-400 px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleEditSave}
+                className="text-xs text-slate-900 font-bold px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+              >
+                저장
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── Ingredient Receipt ── */}
         <div className="relative max-w-[280px] mx-auto">
@@ -139,21 +319,50 @@ export default function ResultPage() {
         </div>
 
         {/* ── Action Buttons ── */}
-        <div className="grid grid-cols-3 gap-4 pt-4">
-          <button className="flex flex-col items-center gap-2 group">
-            <div className="size-14 rounded-full bg-primary flex items-center justify-center text-background-dark shadow-lg shadow-primary/20 group-active:scale-95 transition-transform">
-              <span className="material-symbols-outlined">menu_book</span>
+        <div className="grid grid-cols-4 gap-3 pt-4">
+          <button
+            onClick={handleSave}
+            disabled={saved}
+            className="flex flex-col items-center gap-2 group"
+          >
+            <div
+              className={`size-14 rounded-full flex items-center justify-center shadow-lg group-active:scale-95 transition-transform ${
+                saved
+                  ? "bg-surface border-2 border-primary/30 text-primary"
+                  : "bg-primary text-background-dark shadow-primary/20"
+              }`}
+            >
+              <span className="material-symbols-outlined">
+                {saved ? "check" : "menu_book"}
+              </span>
             </div>
-            <span className="text-xs font-bold text-slate-400">
-              요리책에 저장
+            <span className="text-[10px] font-bold text-slate-400">
+              {saved ? "저장됨!" : "요리책에 저장"}
             </span>
           </button>
-          <button className="flex flex-col items-center gap-2 group">
+          <button
+            onClick={handleEdit}
+            disabled={editing}
+            className="flex flex-col items-center gap-2 group"
+          >
             <div className="size-14 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center text-primary group-active:scale-95 transition-transform">
               <span className="material-symbols-outlined">ink_pen</span>
             </div>
-            <span className="text-xs font-bold text-slate-400">
-              가니쉬 (편집)
+            <span className="text-[10px] font-bold text-slate-400">
+              가니쉬 편집
+            </span>
+          </button>
+          <button
+            onClick={handleShare}
+            className="flex flex-col items-center gap-2 group"
+          >
+            <div className="size-14 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+              <span className="material-symbols-outlined">
+                {copied ? "check" : "share"}
+              </span>
+            </div>
+            <span className="text-[10px] font-bold text-slate-400">
+              {copied ? "복사됨!" : "공유"}
             </span>
           </button>
           <button
@@ -163,78 +372,14 @@ export default function ResultPage() {
             <div className="size-14 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center text-primary group-active:scale-95 transition-transform">
               <span className="material-symbols-outlined">refresh</span>
             </div>
-            <span className="text-xs font-bold text-slate-400">
-              다시 요리하기
+            <span className="text-[10px] font-bold text-slate-400">
+              다시 요리
             </span>
           </button>
         </div>
       </main>
 
-      {/* ── Bottom Nav ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-20">
-        <div className="max-w-md mx-auto flex gap-2 border-t border-neutral-green/50 bg-background-dark/90 backdrop-blur-xl px-4 pb-8 pt-2">
-          <Link
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400"
-            href="/"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">kitchen</span>
-            </div>
-            <p className="text-[10px] font-medium leading-normal tracking-tight">
-              주방
-            </p>
-          </Link>
-          <a
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">inventory_2</span>
-            </div>
-            <p className="text-[10px] font-medium leading-normal tracking-tight">
-              식료품
-            </p>
-          </a>
-          <a
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-primary"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                restaurant
-              </span>
-            </div>
-            <p className="text-[10px] font-medium leading-normal tracking-tight">
-              서빙됨
-            </p>
-          </a>
-          <a
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">menu_book</span>
-            </div>
-            <p className="text-[10px] font-medium leading-normal tracking-tight">
-              요리책
-            </p>
-          </a>
-          <a
-            className="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400"
-            href="#"
-          >
-            <div className="flex h-8 items-center justify-center">
-              <span className="material-symbols-outlined">person</span>
-            </div>
-            <p className="text-[10px] font-medium leading-normal tracking-tight">
-              셰프
-            </p>
-          </a>
-        </div>
-      </nav>
+      <BottomNav variant="result" />
     </div>
   );
 }
