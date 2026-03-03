@@ -329,12 +329,18 @@ export default function KitchenPage() {
 
             <div className="wood-counter rounded-2xl p-1 shadow-lg h-full min-h-0">
               <div className="bg-white/95 rounded-2xl border border-white shadow-inner p-3 h-full min-h-0 flex flex-col">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-base font-medium placeholder:text-slate-300 resize-none p-0 min-h-[96px]"
-                  placeholder="줄거리 단서나 문장을 넣어주세요. AI가 하나의 요리처럼 이야기로 완성해요."
-                />
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-500">스토리 재료 입력</span>
+                  <span className="text-[10px] text-slate-400">터치 후 바로 작성</span>
+                </div>
+                <div className="flex-1 min-h-0 rounded-xl border-2 border-amber-200 bg-white px-3 py-2.5 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-100 transition-all">
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="h-full w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-base font-medium placeholder:text-slate-400 resize-none p-0 min-h-[96px]"
+                    placeholder="줄거리 단서나 문장을 넣어주세요. AI가 하나의 요리처럼 이야기로 완성해요."
+                  />
+                </div>
                 <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center">
                   <div className="flex -space-x-1">
                     <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center border-2 border-white shadow-sm">
