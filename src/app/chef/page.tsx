@@ -11,6 +11,7 @@ export default function ChefPage() {
       localStorage.removeItem("fridge-writer-ingredients");
       localStorage.removeItem("fridge-writer-prompt");
       localStorage.removeItem("fridge-writer-cookmode");
+      localStorage.removeItem("fridge-writer-writingstyle");
       localStorage.removeItem("fridge-writer-memos");
       localStorage.removeItem("fridge-writer-cookbook");
       setCleared(true);
@@ -80,7 +81,7 @@ export default function ChefPage() {
                 <div>
                   <p className="text-sm font-bold text-slate-200">요리</p>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    500자 이내의 완성된 시놉시스. 읽을 수 있는 글로 완성합니다.
+                    900~1500자의 긴 완성형 서사. 기승전결이 모두 담긴 한 편의 글로 완성합니다.
                   </p>
                 </div>
               </div>

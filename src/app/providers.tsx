@@ -19,6 +19,12 @@ export interface Ingredient {
 
 export type CookMode = "prep" | "mealkit" | "fullcook";
 
+export type WritingStyle =
+  | "balanced"
+  | "lyrical"
+  | "noir"
+  | "classic";
+
 export interface CookResult {
   mode: CookMode;
   title: string;
@@ -56,6 +62,8 @@ interface AppContextType {
   // Cook mode
   cookMode: CookMode;
   setCookMode: (mode: CookMode) => void;
+  writingStyle: WritingStyle;
+  setWritingStyle: (style: WritingStyle) => void;
   // Cook result
   cookResult: CookResult | null;
   setCookResult: (result: CookResult | null) => void;
@@ -134,6 +142,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [cookMode, setCookModeState] = useState<CookMode>(() =>
     readLS<CookMode>("fridge-writer-cookmode", "mealkit")
   );
+  const [writingStyle, setWritingStyleState] = useState<WritingStyle>(() =>
+    readLS<WritingStyle>("fridge-writer-writingstyle", "balanced")
+  );
   const [cookResult, setCookResult] = useState<CookResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -159,6 +170,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     writeLS("fridge-writer-cookmode", cookMode);
   }, [cookMode]);
+
+  useEffect(() => {
+    writeLS("fridge-writer-writingstyle", writingStyle);
+  }, [writingStyle]);
 
   useEffect(() => {
     writeLS("fridge-writer-memos", memos);
@@ -187,6 +202,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setCookMode = useCallback((mode: CookMode) => {
     setCookModeState(mode);
+  }, []);
+
+  const setWritingStyle = useCallback((style: WritingStyle) => {
+    setWritingStyleState(style);
   }, []);
 
   // ── Memo actions ──
@@ -245,6 +264,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPrompt,
         cookMode,
         setCookMode,
+        writingStyle,
+        setWritingStyle,
         cookResult,
         setCookResult,
         isLoading,
