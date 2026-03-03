@@ -333,11 +333,11 @@ export default function KitchenPage() {
                   <span className="text-[11px] font-bold text-slate-500">스토리 재료 입력</span>
                   <span className="text-[9px] text-slate-400">터치 후 바로 작성</span>
                 </div>
-                <div className="flex-1 min-h-0 rounded-xl border-2 border-amber-300 bg-white px-2.5 py-2 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-100 transition-all">
+                <div className="flex-1 min-h-0 rounded-xl border-2 border-amber-300 bg-white px-2.5 py-2 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-100 transition-all overflow-hidden">
                   <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    className="h-full w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-[15px] font-medium placeholder:text-slate-400 resize-none p-0 min-h-[78px]"
+                    className="block h-full w-full min-h-0 bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-[15px] leading-relaxed font-medium placeholder:text-slate-400 resize-none p-0 overflow-y-auto"
                     placeholder="줄거리 단서나 문장을 넣어주세요. AI가 하나의 요리처럼 이야기로 완성해요."
                   />
                 </div>
