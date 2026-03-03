@@ -12,6 +12,9 @@ export default function ChefPage() {
       localStorage.removeItem("fridge-writer-prompt");
       localStorage.removeItem("fridge-writer-cookmode");
       localStorage.removeItem("fridge-writer-writingstyle");
+      localStorage.removeItem("fridge-writer-cookresult");
+      localStorage.removeItem("fridge-writer-active-session");
+      localStorage.removeItem("fridge-writer-ingredient-library");
       localStorage.removeItem("fridge-writer-memos");
       localStorage.removeItem("fridge-writer-cookbook");
       setCleared(true);

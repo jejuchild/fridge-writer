@@ -85,6 +85,14 @@ export default function CookbookPage() {
                         <span className="text-[10px] font-bold bg-neutral-green/50 text-primary/70 px-2 py-0.5 rounded-full">
                           {modeLabel(entry.result.mode)}
                         </span>
+                        {entry.style && (
+                          <span className="text-[10px] font-bold bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">
+                            {entry.style === "balanced" && "균형"}
+                            {entry.style === "lyrical" && "서정"}
+                            {entry.style === "noir" && "느와르"}
+                            {entry.style === "classic" && "고전"}
+                          </span>
+                        )}
                         <span className="text-[10px] text-slate-600">
                           {new Date(entry.createdAt).toLocaleDateString("ko-KR", {
                             month: "short",
@@ -168,6 +176,13 @@ export default function CookbookPage() {
                           </span>
                         ))}
                       </div>
+
+                      {entry.seasonings && entry.seasonings.length > 0 && (
+                        <div className="text-xs text-slate-500">
+                          <span className="text-primary/60 font-bold">조미료 히스토리</span>{" "}
+                          {entry.seasonings.join(" · ")}
+                        </div>
+                      )}
 
                       {/* Delete */}
                       <button

@@ -6,10 +6,9 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
-
-// ── Types ──
 
 export interface Ingredient {
   id: string;
@@ -18,15 +17,11 @@ export interface Ingredient {
 }
 
 export type CookMode = "prep" | "mealkit" | "fullcook";
-
-export type WritingStyle =
-  | "balanced"
-  | "lyrical"
-  | "noir"
-  | "classic";
+export type WritingStyle = "balanced" | "lyrical" | "noir" | "classic";
 
 export interface CookResult {
   mode: CookMode;
+  style?: WritingStyle;
   title: string;
   premise?: string;
   keywords?: string[];
@@ -43,46 +38,65 @@ export interface Memo {
   createdAt: number;
 }
 
+export interface CookSessionSnapshot {
+  ingredientsUsed: Ingredient[];
+  promptUsed: string;
+  modeUsed: CookMode;
+  styleUsed: WritingStyle;
+  seasonings: string[];
+  createdAt: number;
+}
+
+export interface PersonalizationHints {
+  preferredKeywords: string[];
+  memoHighlights: string[];
+  referencePhrases: string[];
+}
+
 export interface CookbookEntry {
   id: string;
   result: CookResult;
   ingredients: Ingredient[];
   prompt: string;
+  style?: WritingStyle;
+  seasonings?: string[];
   createdAt: number;
 }
 
 interface AppContextType {
-  // Ingredients (kitchen)
   ingredients: Ingredient[];
+  ingredientLibrary: string[];
   addIngredient: (text: string) => void;
+  addIngredientFromLibrary: (text: string) => void;
   removeIngredient: (id: string) => void;
-  // Prompt (kitchen)
   prompt: string;
   setPrompt: (val: string) => void;
-  // Cook mode
   cookMode: CookMode;
   setCookMode: (mode: CookMode) => void;
   writingStyle: WritingStyle;
   setWritingStyle: (style: WritingStyle) => void;
-  // Cook result
   cookResult: CookResult | null;
   setCookResult: (result: CookResult | null) => void;
-  // Loading
+  activeSession: CookSessionSnapshot | null;
+  prepareCookSession: (payload: {
+    ingredientsUsed: Ingredient[];
+    promptUsed: string;
+    modeUsed: CookMode;
+    styleUsed: WritingStyle;
+  }) => void;
+  addSeasoningToSession: (seasoning: string) => void;
+  personalizationHints: PersonalizationHints;
   isLoading: boolean;
   setIsLoading: (val: boolean) => void;
-  // Memos (pantry)
   memos: Memo[];
   addMemo: (text: string) => void;
   removeMemo: (id: string) => void;
   updateMemo: (id: string, text: string) => void;
   useAsIngredient: (memo: Memo) => void;
-  // Cookbook
   cookbook: CookbookEntry[];
   addToCookbook: () => void;
   removeFromCookbook: (id: string) => void;
 }
-
-// ── Constants ──
 
 const ICONS = [
   "auto_awesome",
@@ -105,63 +119,134 @@ const DEFAULT_INGREDIENTS: Ingredient[] = [
   { id: "default-3", text: "말없는 주인공", icon: "person" },
 ];
 
-// ── Helpers ──
+const STOPWORDS = new Set([
+  "그리고",
+  "그러나",
+  "하지만",
+  "그녀",
+  "그는",
+  "이야기",
+  "장면",
+  "사람",
+  "정도",
+  "에서",
+  "으로",
+]);
 
 function readLS<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
     const saved = localStorage.getItem(key);
-    if (saved) {
-      const parsed: unknown = JSON.parse(saved);
-      if (Array.isArray(parsed)) return parsed as T;
-      return parsed as T;
-    }
+    if (!saved) return fallback;
+    return JSON.parse(saved) as T;
   } catch {
-    // Invalid localStorage data
+    return fallback;
   }
-  return fallback;
 }
 
 function writeLS(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-// ── Context ──
+function normalizeCookMode(value: unknown): CookMode {
+  return value === "prep" || value === "mealkit" || value === "fullcook"
+    ? value
+    : "mealkit";
+}
+
+function normalizeWritingStyle(value: unknown): WritingStyle {
+  return value === "balanced" ||
+    value === "lyrical" ||
+    value === "noir" ||
+    value === "classic"
+    ? value
+    : "balanced";
+}
+
+function buildPersonalization(
+  memos: Memo[],
+  cookbook: CookbookEntry[]
+): PersonalizationHints {
+  const corpus = [
+    ...memos.map((m) => m.text),
+    ...cookbook.map((e) => e.result.title),
+    ...cookbook.map((e) => e.result.premise || ""),
+    ...cookbook.map((e) => e.result.synopsis || ""),
+  ].join(" ");
+
+  const words = corpus.match(/[가-힣]{2,}/g) || [];
+  const counts = new Map<string, number>();
+  for (const word of words) {
+    if (STOPWORDS.has(word)) continue;
+    counts.set(word, (counts.get(word) || 0) + 1);
+  }
+
+  const preferredKeywords = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([word]) => word);
+
+  const memoHighlights = memos.slice(0, 3).map((m) => m.text);
+  const referencePhrases = cookbook
+    .slice(0, 3)
+    .map((e) => e.result.premise || e.result.title)
+    .filter(Boolean);
+
+  return { preferredKeywords, memoHighlights, referencePhrases };
+}
 
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Kitchen state
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
     const saved = readLS<Ingredient[]>("fridge-writer-ingredients", []);
     return saved.length > 0 ? saved : DEFAULT_INGREDIENTS;
   });
+
+  const [ingredientLibrary, setIngredientLibrary] = useState<string[]>(() => {
+    const saved = readLS<string[]>("fridge-writer-ingredient-library", []);
+    if (saved.length > 0) return saved;
+    return DEFAULT_INGREDIENTS.map((i) => i.text);
+  });
+
   const [prompt, setPromptState] = useState<string>(() =>
     readLS<string>("fridge-writer-prompt", "")
   );
+
   const [cookMode, setCookModeState] = useState<CookMode>(() =>
-    readLS<CookMode>("fridge-writer-cookmode", "mealkit")
+    normalizeCookMode(readLS<unknown>("fridge-writer-cookmode", "mealkit"))
   );
+
   const [writingStyle, setWritingStyleState] = useState<WritingStyle>(() =>
-    readLS<WritingStyle>("fridge-writer-writingstyle", "balanced")
+    normalizeWritingStyle(readLS<unknown>("fridge-writer-writingstyle", "balanced"))
   );
-  const [cookResult, setCookResult] = useState<CookResult | null>(null);
+
+  const [cookResult, setCookResultState] = useState<CookResult | null>(() =>
+    readLS<CookResult | null>("fridge-writer-cookresult", null)
+  );
+
+  const [activeSession, setActiveSession] = useState<CookSessionSnapshot | null>(() =>
+    readLS<CookSessionSnapshot | null>("fridge-writer-active-session", null)
+  );
+
   const [isLoading, setIsLoading] = useState(false);
-
-  // Pantry memos
-  const [memos, setMemos] = useState<Memo[]>(() =>
-    readLS<Memo[]>("fridge-writer-memos", [])
-  );
-
-  // Cookbook
+  const [memos, setMemos] = useState<Memo[]>(() => readLS<Memo[]>("fridge-writer-memos", []));
   const [cookbook, setCookbook] = useState<CookbookEntry[]>(() =>
     readLS<CookbookEntry[]>("fridge-writer-cookbook", [])
   );
 
-  // ── Persistence ──
+  const personalizationHints = useMemo(
+    () => buildPersonalization(memos, cookbook),
+    [memos, cookbook]
+  );
+
   useEffect(() => {
     writeLS("fridge-writer-ingredients", ingredients);
   }, [ingredients]);
+
+  useEffect(() => {
+    writeLS("fridge-writer-ingredient-library", ingredientLibrary);
+  }, [ingredientLibrary]);
 
   useEffect(() => {
     writeLS("fridge-writer-prompt", prompt);
@@ -176,6 +261,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [writingStyle]);
 
   useEffect(() => {
+    writeLS("fridge-writer-cookresult", cookResult);
+  }, [cookResult]);
+
+  useEffect(() => {
+    writeLS("fridge-writer-active-session", activeSession);
+  }, [activeSession]);
+
+  useEffect(() => {
     writeLS("fridge-writer-memos", memos);
   }, [memos]);
 
@@ -183,35 +276,81 @@ export function AppProvider({ children }: { children: ReactNode }) {
     writeLS("fridge-writer-cookbook", cookbook);
   }, [cookbook]);
 
-  // ── Ingredient actions ──
-  const addIngredient = useCallback((text: string) => {
-    const icon = ICONS[Math.floor(Math.random() * ICONS.length)];
-    setIngredients((prev) => [
-      ...prev,
-      { id: Date.now().toString(), text, icon },
-    ]);
+  const ensureLibrary = useCallback((text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setIngredientLibrary((prev) => {
+      if (prev.some((item) => item === trimmed)) return prev;
+      return [trimmed, ...prev];
+    });
   }, []);
+
+  const addIngredient = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      const icon = ICONS[Math.floor(Math.random() * ICONS.length)];
+      setIngredients((prev) => [
+        ...prev,
+        { id: `${Date.now()}-${Math.random()}`, text: trimmed, icon },
+      ]);
+      ensureLibrary(trimmed);
+    },
+    [ensureLibrary]
+  );
+
+  const addIngredientFromLibrary = useCallback(
+    (text: string) => {
+      addIngredient(text);
+    },
+    [addIngredient]
+  );
 
   const removeIngredient = useCallback((id: string) => {
     setIngredients((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
-  const setPrompt = useCallback((val: string) => {
-    setPromptState(val);
+  const setPrompt = useCallback((val: string) => setPromptState(val), []);
+  const setCookMode = useCallback((mode: CookMode) => setCookModeState(mode), []);
+  const setWritingStyle = useCallback(
+    (style: WritingStyle) => setWritingStyleState(style),
+    []
+  );
+
+  const setCookResult = useCallback((result: CookResult | null) => {
+    setCookResultState(result);
   }, []);
 
-  const setCookMode = useCallback((mode: CookMode) => {
-    setCookModeState(mode);
+  const prepareCookSession = useCallback(
+    (payload: {
+      ingredientsUsed: Ingredient[];
+      promptUsed: string;
+      modeUsed: CookMode;
+      styleUsed: WritingStyle;
+    }) => {
+      setActiveSession({
+        ...payload,
+        seasonings: [],
+        createdAt: Date.now(),
+      });
+    },
+    []
+  );
+
+  const addSeasoningToSession = useCallback((seasoning: string) => {
+    const trimmed = seasoning.trim();
+    if (!trimmed) return;
+    setActiveSession((prev) => {
+      if (!prev) return prev;
+      return { ...prev, seasonings: [...prev.seasonings, trimmed] };
+    });
   }, []);
 
-  const setWritingStyle = useCallback((style: WritingStyle) => {
-    setWritingStyleState(style);
-  }, []);
-
-  // ── Memo actions ──
   const addMemo = useCallback((text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     setMemos((prev) => [
-      { id: Date.now().toString(), text, createdAt: Date.now() },
+      { id: `${Date.now()}-${Math.random()}`, text: trimmed, createdAt: Date.now() },
       ...prev,
     ]);
   }, []);
@@ -221,34 +360,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateMemo = useCallback((id: string, text: string) => {
-    setMemos((prev) => prev.map((m) => (m.id === id ? { ...m, text } : m)));
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setMemos((prev) => prev.map((m) => (m.id === id ? { ...m, text: trimmed } : m)));
   }, []);
 
-  const useAsIngredient = useCallback((memo: Memo) => {
-    const icon = ICONS[Math.floor(Math.random() * ICONS.length)];
-    setIngredients((prev) => [
-      ...prev,
-      { id: `memo-${memo.id}-${Date.now()}`, text: memo.text, icon },
-    ]);
-  }, []);
+  const useAsIngredient = useCallback(
+    (memo: Memo) => {
+      addIngredient(memo.text);
+    },
+    [addIngredient]
+  );
 
-  // ── Cookbook actions ──
   const addToCookbook = useCallback(() => {
-    setCookResult((currentResult) => {
+    setCookResultState((currentResult) => {
       if (!currentResult) return currentResult;
-      setCookbook((prev) => [
-        {
-          id: Date.now().toString(),
-          result: currentResult,
-          ingredients: ingredients,
-          prompt: prompt,
-          createdAt: Date.now(),
-        },
-        ...prev,
-      ]);
+      setCookbook((prev) => {
+        const snapshot = activeSession;
+        return [
+          {
+            id: `${Date.now()}-${Math.random()}`,
+            result: currentResult,
+            ingredients: snapshot?.ingredientsUsed ?? ingredients,
+            prompt: snapshot?.promptUsed ?? prompt,
+            style: snapshot?.styleUsed,
+            seasonings: snapshot?.seasonings ?? [],
+            createdAt: Date.now(),
+          },
+          ...prev,
+        ];
+      });
       return currentResult;
     });
-  }, [ingredients, prompt]);
+  }, [activeSession, ingredients, prompt]);
 
   const removeFromCookbook = useCallback((id: string) => {
     setCookbook((prev) => prev.filter((e) => e.id !== id));
@@ -258,7 +402,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider
       value={{
         ingredients,
+        ingredientLibrary,
         addIngredient,
+        addIngredientFromLibrary,
         removeIngredient,
         prompt,
         setPrompt,
@@ -268,6 +414,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setWritingStyle,
         cookResult,
         setCookResult,
+        activeSession,
+        prepareCookSession,
+        addSeasoningToSession,
+        personalizationHints,
         isLoading,
         setIsLoading,
         memos,

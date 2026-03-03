@@ -6,11 +6,20 @@ import { useApp } from "../providers";
 import BottomNav from "../components/BottomNav";
 
 export default function ResultPage() {
-  const { cookResult, ingredients, addToCookbook, setCookResult } = useApp();
+  const {
+    cookResult,
+    activeSession,
+    personalizationHints,
+    addSeasoningToSession,
+    addToCookbook,
+    setCookResult,
+  } = useApp();
   const router = useRouter();
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState("");
+  const [seasoning, setSeasoning] = useState("");
+  const [isDeveloping, setIsDeveloping] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -22,6 +31,7 @@ export default function ResultPage() {
   if (!cookResult) return null;
 
   const mode = cookResult.mode || "mealkit";
+  const usedIngredients = activeSession?.ingredientsUsed || [];
 
   const handleSave = () => {
     addToCookbook();
@@ -62,6 +72,41 @@ export default function ResultPage() {
       }
     } catch {
       return;
+    }
+  };
+
+  const handleDevelop = async () => {
+    if (!seasoning.trim() || !activeSession) return;
+    setIsDeveloping(true);
+    try {
+      const res = await fetch("/api/cook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "develop",
+          ingredients: activeSession.ingredientsUsed.map((i) => i.text),
+          prompt: activeSession.promptUsed,
+          mode: activeSession.modeUsed,
+          style: activeSession.styleUsed,
+          previousResult: cookResult,
+          seasoning: seasoning.trim(),
+          personalization: personalizationHints,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("요리 디벨롭에 실패했습니다.");
+      }
+
+      const next = await res.json();
+      setCookResult(next);
+      addSeasoningToSession(seasoning.trim());
+      setSeasoning("");
+      setSaved(false);
+    } catch {
+      return;
+    } finally {
+      setIsDeveloping(false);
     }
   };
 
@@ -215,7 +260,7 @@ export default function ResultPage() {
                 <p className="font-mono text-[10px] font-bold">재료 체크리스트</p>
               </div>
               <ul className="font-mono text-[10px] space-y-1.5 text-slate-500">
-                {ingredients.map((ingredient) => (
+                {usedIngredients.map((ingredient) => (
                   <li key={ingredient.id} className="flex justify-between">
                     <span>+ {ingredient.text}</span>
                     <span>x1</span>
@@ -227,6 +272,26 @@ export default function ResultPage() {
                 <span>{cookResult.complexity}/10</span>
               </div>
             </div>
+          </div>
+
+          <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-500">liquor</span>
+              <h3 className="text-sm font-extrabold text-slate-700">조미료 넣기</h3>
+            </div>
+            <textarea
+              value={seasoning}
+              onChange={(e) => setSeasoning(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 min-h-[86px] focus:outline-none focus:border-amber-300 resize-none"
+              placeholder="새로운 아이디어, 전개 방향, 문장 단서를 넣으면 현재 요리를 다시 디벨롭합니다."
+            />
+            <button
+              onClick={handleDevelop}
+              disabled={isDeveloping || !seasoning.trim() || !activeSession}
+              className="w-full py-2.5 rounded-xl bg-amber-300 text-slate-800 text-xs font-extrabold disabled:opacity-40"
+            >
+              {isDeveloping ? "디벨롭 중..." : "조미료 넣고 업데이트"}
+            </button>
           </div>
         </div>
 

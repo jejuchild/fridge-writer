@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useApp } from "../providers";
+import { useApp, type Memo } from "../providers";
 import { useRouter } from "next/navigation";
 import BottomNav from "../components/BottomNav";
 
@@ -24,12 +24,12 @@ export default function PantryPage() {
     }
   };
 
-  const handleConvertToIngredient = (memo: typeof memos[0]) => {
+  const handleConvertToIngredient = (memo: Memo) => {
     convertToIngredient(memo);
     router.push("/");
   };
 
-  const startEdit = (memo: typeof memos[0]) => {
+  const startEdit = (memo: Memo) => {
     setEditingId(memo.id);
     setEditText(memo.text);
   };
