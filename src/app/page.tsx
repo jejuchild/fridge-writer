@@ -111,7 +111,7 @@ export default function KitchenPage() {
       <div className="kitchen-bg h-screen flex flex-col max-w-md mx-auto w-full relative shadow-2xl overflow-hidden">
         <div className="pointer-events-none absolute inset-0 sun-glare" />
 
-        <header className="sticky top-0 z-30 bg-white/75 backdrop-blur-xl border-b border-white/70 p-3 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-white/70 px-3 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-300/30 flex items-center justify-center text-amber-500 shadow-sm border border-white">
               <span
@@ -122,10 +122,10 @@ export default function KitchenPage() {
               </span>
             </div>
             <div>
-              <h1 className="text-base font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-[15px] font-extrabold tracking-tight text-slate-900 leading-tight">
                 작가의 냉장고
               </h1>
-              <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 font-bold leading-tight">
                 Morning Inspiration
               </p>
             </div>
@@ -138,23 +138,23 @@ export default function KitchenPage() {
           </Link>
         </header>
 
-        <main className="relative z-10 p-3 space-y-3 flex-1 overflow-hidden flex flex-col pb-24">
-          <section className="retro-fridge rounded-[1.8rem] overflow-hidden border-4 border-white shadow-xl relative">
+        <main className="relative z-10 px-3 pt-2 pb-22 space-y-2.5 flex-1 overflow-hidden flex flex-col">
+          <section className="retro-fridge rounded-[1.5rem] overflow-hidden border-4 border-white shadow-xl relative">
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/45 to-transparent pointer-events-none" />
-            <div className="p-3 flex flex-col gap-2.5">
+            <div className="p-2.5 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-amber-500">
                     kitchen
                   </span>
-                  <h2 className="font-bold text-sm text-slate-700">식료품 냉장칸</h2>
+                  <h2 className="font-bold text-[12px] text-slate-700">식료품 냉장칸</h2>
                 </div>
                 <span className="text-[10px] font-bold bg-white text-slate-400 border border-slate-100 px-2 py-0.5 rounded-full shadow-sm">
                   {ingredients.length}개 보관 중
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1">
+              <div className="flex flex-wrap gap-1.5 max-h-[86px] overflow-y-auto pr-1">
                 {ingredients.map((ingredient, index) => (
                   <button
                     key={ingredient.id}
@@ -169,16 +169,16 @@ export default function KitchenPage() {
                 ))}
 
                 {addPanel === "choice" && (
-                  <div className="flex h-9 items-center gap-2">
+                  <div className="flex h-8 items-center gap-1.5">
                     <button
                       onClick={() => setAddPanel("library")}
-                      className="h-9 rounded-full bg-emerald-100 border border-emerald-200 px-4 text-xs font-bold text-emerald-700"
+                      className="h-8 rounded-full bg-emerald-100 border border-emerald-200 px-3 text-[11px] font-bold text-emerald-700"
                     >
                       냉장고에서 꺼내기
                     </button>
                     <button
                       onClick={() => setAddPanel("new")}
-                      className="h-9 rounded-full bg-amber-100 border border-amber-200 px-4 text-xs font-bold text-amber-700"
+                      className="h-8 rounded-full bg-amber-100 border border-amber-200 px-3 text-[11px] font-bold text-amber-700"
                     >
                       새로 입력하기
                     </button>
@@ -186,7 +186,7 @@ export default function KitchenPage() {
                 )}
 
                 {addPanel === "library" && (
-                  <div className="w-full rounded-2xl bg-white/80 border border-slate-200 p-3 space-y-2">
+                  <div className="w-full rounded-2xl bg-white/85 border border-slate-200 p-2.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-[11px] font-bold text-slate-600">보관 재료 선택</p>
                       <button
@@ -196,7 +196,7 @@ export default function KitchenPage() {
                         뒤로
                       </button>
                     </div>
-                    <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-1">
+                    <div className="flex flex-wrap gap-1.5 max-h-[76px] overflow-y-auto pr-1">
                       {ingredientLibrary
                         .filter(
                           (item) => !ingredients.some((current) => current.text === item)
@@ -209,7 +209,7 @@ export default function KitchenPage() {
                               addIngredientFromLibrary(item);
                               setAddPanel("none");
                             }}
-                            className="text-xs px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-700"
+                            className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-700"
                           >
                             {item}
                           </button>
@@ -219,7 +219,7 @@ export default function KitchenPage() {
                 )}
 
                 {addPanel === "new" ? (
-                  <div className="flex h-9 items-center gap-2">
+                  <div className="flex h-8 items-center gap-1.5">
                     <input
                       ref={addInputRef}
                       type="text"
@@ -238,12 +238,12 @@ export default function KitchenPage() {
                           setNewIngredient("");
                         }
                       }}
-                      className="h-9 rounded-full bg-white border border-amber-200 px-4 text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-amber-400 w-36"
+                      className="h-8 rounded-full bg-white border border-amber-200 px-3 text-[11px] font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-amber-400 w-32"
                       placeholder="재료 입력"
                     />
                     <button
                       onClick={handleAddIngredient}
-                      className="h-9 rounded-full bg-amber-300/30 border border-amber-300 px-3 text-xs font-bold text-amber-700 hover:bg-amber-300/40 transition-colors"
+                      className="h-8 rounded-full bg-amber-300/30 border border-amber-300 px-2.5 text-[11px] font-bold text-amber-700 hover:bg-amber-300/40 transition-colors"
                     >
                       추가
                     </button>
@@ -251,10 +251,10 @@ export default function KitchenPage() {
                 ) : (
                   <button
                     onClick={() => setAddPanel("choice")}
-                    className="flex h-9 items-center justify-center gap-x-2 rounded-full border-2 border-dashed border-slate-200 px-4 hover:border-amber-300 transition-colors text-slate-400 hover:text-amber-500 bg-white/70"
+                    className="flex h-8 items-center justify-center gap-x-1.5 rounded-full border-2 border-dashed border-slate-200 px-3 hover:border-amber-300 transition-colors text-slate-400 hover:text-amber-500 bg-white/70"
                   >
                     <span className="material-symbols-outlined text-sm">add</span>
-                    <p className="text-xs font-bold">새 재료</p>
+                    <p className="text-[11px] font-bold">새 재료</p>
                   </button>
                 )}
               </div>
@@ -262,12 +262,12 @@ export default function KitchenPage() {
             <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-24 bg-gradient-to-r from-slate-200 to-slate-100 rounded-full shadow-inner border border-white" />
           </section>
 
-          <section className="space-y-2 pt-0.5">
-            <div className="flex items-center gap-2 px-1">
-              <span className="material-symbols-outlined text-amber-500 text-lg">
+          <section className="space-y-1.5 pt-0.5">
+            <div className="flex items-center gap-1.5 px-1">
+              <span className="material-symbols-outlined text-amber-500 text-base">
                 skillet
               </span>
-              <h2 className="text-sm font-extrabold text-slate-800">요리 방식</h2>
+              <h2 className="text-[12px] font-extrabold text-slate-800">요리 방식</h2>
             </div>
             <div className="grid grid-cols-3 gap-1.5">
               {COOK_MODES.map(({ mode, icon, label }) => {
@@ -276,72 +276,72 @@ export default function KitchenPage() {
                   <button
                     key={mode}
                     onClick={() => setCookMode(mode)}
-                    className={`rounded-xl py-2 px-1 border transition-all flex flex-col items-center gap-1 ${
+                    className={`rounded-lg py-1.5 px-1 border transition-all flex flex-col items-center gap-0.5 ${
                       isActive
                         ? "bg-amber-300 text-slate-800 border-amber-200 shadow-md"
                         : "bg-white/90 text-slate-500 border-white hover:border-amber-200"
                     }`}
                   >
                     <span className="material-symbols-outlined text-base">{icon}</span>
-                    <span className="text-[11px] font-bold">{label}</span>
+                    <span className="text-[10px] font-bold">{label}</span>
                   </button>
                 );
               })}
             </div>
           </section>
 
-          <section className="space-y-2 pt-0.5">
-            <div className="flex items-center gap-2 px-1">
-              <span className="material-symbols-outlined text-amber-500 text-lg">
+          <section className="space-y-1.5 pt-0.5">
+            <div className="flex items-center gap-1.5 px-1">
+              <span className="material-symbols-outlined text-amber-500 text-base">
                 style
               </span>
-              <h2 className="text-sm font-extrabold text-slate-800">문체 프로필</h2>
+              <h2 className="text-[12px] font-extrabold text-slate-800">문체 프로필</h2>
             </div>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-4 gap-1.5">
               {WRITING_STYLES.map(({ style, icon, label, desc }) => {
                 const isActive = writingStyle === style;
                 return (
                   <button
                     key={style}
                     onClick={() => setWritingStyle(style)}
-                    className={`rounded-xl py-2 px-2.5 border transition-all text-left ${
+                    className={`rounded-lg py-1.5 px-1.5 border transition-all text-left ${
                       isActive
                         ? "bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm"
                         : "bg-white/90 text-slate-500 border-white hover:border-emerald-100"
                     }`}
                   >
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-base">{icon}</span>
-                      <span className="text-[11px] font-extrabold">{label}</span>
+                      <span className="text-[10px] font-extrabold">{label}</span>
                     </div>
-                    <p className="text-[10px] mt-0.5">{desc}</p>
+                    <p className="text-[9px] mt-0.5 leading-tight">{desc}</p>
                   </button>
                 );
               })}
             </div>
           </section>
 
-          <section className="space-y-2 flex-1 min-h-0">
+          <section className="space-y-1.5 flex-1 min-h-0">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-base font-extrabold tracking-tight text-slate-900">믹싱 볼</h2>
+              <h2 className="text-[13px] font-extrabold tracking-tight text-slate-900">믹싱 볼</h2>
               <span className="material-symbols-outlined text-amber-500">restaurant</span>
             </div>
 
             <div className="wood-counter rounded-2xl p-1 shadow-lg h-full min-h-0">
               <div className="bg-white/95 rounded-2xl border border-white shadow-inner p-3 h-full min-h-0 flex flex-col">
-                <div className="mb-1.5 flex items-center justify-between">
+                <div className="mb-1 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-500">스토리 재료 입력</span>
-                  <span className="text-[10px] text-slate-400">터치 후 바로 작성</span>
+                  <span className="text-[9px] text-slate-400">터치 후 바로 작성</span>
                 </div>
-                <div className="flex-1 min-h-0 rounded-xl border-2 border-amber-200 bg-white px-3 py-2.5 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-100 transition-all">
+                <div className="flex-1 min-h-0 rounded-xl border-2 border-amber-300 bg-white px-2.5 py-2 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-100 transition-all">
                   <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    className="h-full w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-base font-medium placeholder:text-slate-400 resize-none p-0 min-h-[96px]"
+                    className="h-full w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-800 text-[15px] font-medium placeholder:text-slate-400 resize-none p-0 min-h-[78px]"
                     placeholder="줄거리 단서나 문장을 넣어주세요. AI가 하나의 요리처럼 이야기로 완성해요."
                   />
                 </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center">
+                <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex justify-between items-center">
                   <div className="flex -space-x-1">
                     <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center border-2 border-white shadow-sm">
                       <span className="material-symbols-outlined text-xs text-orange-600">
@@ -354,7 +354,7 @@ export default function KitchenPage() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">
+                  <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.14em]">
                     향신료 추가됨
                   </span>
                 </div>
@@ -368,32 +368,32 @@ export default function KitchenPage() {
             </div>
           )}
 
-          <div className="flex flex-col items-center justify-center pt-1 pb-0">
+          <div className="flex flex-col items-center justify-center pt-0.5 pb-0">
             <button
               onClick={handleCook}
               disabled={isLoading || (ingredients.length === 0 && !prompt.trim())}
               className="relative group disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <div
-                className={`w-20 h-20 bg-amber-300 rounded-full shadow-xl shadow-amber-300/30 flex items-center justify-center text-white border-4 border-white transition-transform active:scale-95 group-hover:scale-105 ${
+                className={`w-[72px] h-[72px] bg-amber-300 rounded-full shadow-xl shadow-amber-300/30 flex items-center justify-center text-white border-4 border-white transition-transform active:scale-95 group-hover:scale-105 ${
                   isLoading ? "animate-pulse" : ""
                 }`}
               >
                 <span
-                  className={`material-symbols-outlined text-4xl font-light ${
+                  className={`material-symbols-outlined text-[30px] font-light ${
                     isLoading ? "animate-spin-slow" : ""
                   }`}
                 >
                   {isLoading ? "autorenew" : "timer"}
                 </span>
               </div>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-lg border border-slate-50 whitespace-nowrap">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-800">
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white px-3.5 py-1 rounded-full shadow-lg border border-slate-50 whitespace-nowrap">
+                <span className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-800">
                   {isLoading ? "요리 중" : "AI로 요리"}
                 </span>
               </div>
             </button>
-            <p className="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <p className="mt-3 text-[9px] font-bold text-slate-400 uppercase tracking-[0.14em]">
               {isLoading ? "잠시만 기다려주세요" : "예상 15초"}
             </p>
           </div>
