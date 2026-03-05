@@ -11,6 +11,17 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "작가의 냉장고",
   description: "AI가 당신의 재료로 이야기를 요리합니다",
+  openGraph: {
+    title: "작가의 냉장고",
+    description: "AI가 당신의 재료로 이야기를 요리합니다",
+    type: "website",
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary",
+    title: "작가의 냉장고",
+    description: "AI가 당신의 재료로 이야기를 요리합니다",
+  },
 };
 
 export default function RootLayout({
