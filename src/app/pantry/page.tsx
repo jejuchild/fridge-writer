@@ -148,7 +148,7 @@ export default function PantryPage() {
                             minute: "2-digit",
                           })}
                         </span>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleConvertToIngredient(memo)}
                             className="text-[10px] font-bold text-primary px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center gap-1"

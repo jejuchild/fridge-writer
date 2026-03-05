@@ -21,6 +21,7 @@ export default function ResultPage() {
   const [seasoning, setSeasoning] = useState("");
   const [isDeveloping, setIsDeveloping] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!cookResult) {
@@ -71,13 +72,14 @@ export default function ResultPage() {
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
-      return;
+      // Share API cancelled or failed — ignore gracefully
     }
   };
 
   const handleDevelop = async () => {
     if (!seasoning.trim() || !activeSession) return;
     setIsDeveloping(true);
+    setError(null);
     try {
       const res = await fetch("/api/cook", {
         method: "POST",
@@ -103,8 +105,8 @@ export default function ResultPage() {
       addSeasoningToSession(seasoning.trim());
       setSeasoning("");
       setSaved(false);
-    } catch {
-      return;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "디벨롭 중 오류가 발생했습니다");
     } finally {
       setIsDeveloping(false);
     }
@@ -176,7 +178,7 @@ export default function ResultPage() {
             </div>
           )}
 
-          {(!cookResult.mode || mode === "mealkit") && (
+          {mode === "mealkit" && (
             <div className="space-y-4">
               <div className="text-center space-y-3">
                 <h2 className="text-3xl leading-tight text-slate-900 font-extrabold">
@@ -292,15 +294,16 @@ export default function ResultPage() {
             >
               {isDeveloping ? "디벨롭 중..." : "조미료 넣고 업데이트"}
             </button>
+            {error && <p className="text-xs text-red-400 text-center mt-2">{error}</p>}
           </div>
         </div>
 
-        <div className="fixed bottom-24 left-0 right-0 max-w-md mx-auto px-6 flex justify-around items-center z-20">
+        <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto px-6 flex justify-around items-center z-20 pointer-events-none">
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={handleSave}
               disabled={saved}
-              className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center shadow-lg active:scale-95 transition-transform disabled:opacity-60"
+              className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center shadow-lg active:scale-95 transition-transform disabled:opacity-60 pointer-events-auto"
             >
               <span className="material-symbols-outlined text-rose-500">
                 {saved ? "check" : "favorite"}
@@ -314,7 +317,7 @@ export default function ResultPage() {
           <div className="flex flex-col items-center gap-2 -mt-8">
             <button
               onClick={() => router.push("/")}
-              className="w-20 h-20 rounded-full bg-emerald-400 flex items-center justify-center shadow-xl border-4 border-white active:scale-95 transition-transform"
+              className="w-20 h-20 rounded-full bg-emerald-400 flex items-center justify-center shadow-xl border-4 border-white active:scale-95 transition-transform pointer-events-auto"
             >
               <span className="material-symbols-outlined text-white text-4xl">
                 refresh
@@ -326,7 +329,7 @@ export default function ResultPage() {
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={handleEdit}
-              className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+              className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center shadow-lg active:scale-95 transition-transform pointer-events-auto"
             >
               <span className="material-symbols-outlined text-sky-500">edit_note</span>
             </button>
