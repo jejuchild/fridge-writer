@@ -2,21 +2,22 @@
 
 import { useState } from "react";
 import BottomNav from "../components/BottomNav";
+import { STORAGE_KEYS } from "../providers";
 
 export default function ChefPage() {
   const [cleared, setCleared] = useState(false);
 
   const handleClearAll = () => {
     if (confirm("모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
-      localStorage.removeItem("fridge-writer-ingredients");
-      localStorage.removeItem("fridge-writer-prompt");
-      localStorage.removeItem("fridge-writer-cookmode");
-      localStorage.removeItem("fridge-writer-writingstyle");
-      localStorage.removeItem("fridge-writer-cookresult");
-      localStorage.removeItem("fridge-writer-active-session");
-      localStorage.removeItem("fridge-writer-ingredient-library");
-      localStorage.removeItem("fridge-writer-memos");
-      localStorage.removeItem("fridge-writer-cookbook");
+      localStorage.removeItem(STORAGE_KEYS.INGREDIENTS);
+      localStorage.removeItem(STORAGE_KEYS.PROMPT);
+      localStorage.removeItem(STORAGE_KEYS.COOK_MODE);
+      localStorage.removeItem(STORAGE_KEYS.WRITING_STYLE);
+      localStorage.removeItem(STORAGE_KEYS.COOK_RESULT);
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+      localStorage.removeItem(STORAGE_KEYS.INGREDIENT_LIBRARY);
+      localStorage.removeItem(STORAGE_KEYS.MEMOS);
+      localStorage.removeItem(STORAGE_KEYS.COOKBOOK);
       setCleared(true);
       setTimeout(() => window.location.reload(), 500);
     }

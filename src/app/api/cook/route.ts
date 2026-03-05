@@ -1,15 +1,8 @@
 import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
+import type { CookMode, WritingStyle, PersonalizationHints } from "../../types";
 
-type CookMode = "prep" | "mealkit" | "fullcook";
-type WritingStyle = "balanced" | "lyrical" | "noir" | "classic";
 type CookAction = "cook" | "develop";
-
-type PersonalizationHints = {
-  preferredKeywords?: string[];
-  memoHighlights?: string[];
-  referencePhrases?: string[];
-};
 
 type RawResult = Record<string, unknown>;
 

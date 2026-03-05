@@ -9,28 +9,21 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
+import type {
+  CookMode,
+  WritingStyle,
+  Ingredient,
+  CookResult,
+  PersonalizationHints,
+} from "./types";
 
-export interface Ingredient {
-  id: string;
-  text: string;
-  icon: string;
-}
-
-export type CookMode = "prep" | "mealkit" | "fullcook";
-export type WritingStyle = "balanced" | "lyrical" | "noir" | "classic";
-
-export interface CookResult {
-  mode: CookMode;
-  style?: WritingStyle;
-  title: string;
-  premise?: string;
-  keywords?: string[];
-  plotPoints?: string[];
-  atmosphere?: string;
-  secretSauce?: string;
-  synopsis?: string;
-  complexity: number;
-}
+export type {
+  CookMode,
+  WritingStyle,
+  Ingredient,
+  CookResult,
+  PersonalizationHints,
+} from "./types";
 
 export interface Memo {
   id: string;
@@ -47,11 +40,17 @@ export interface CookSessionSnapshot {
   createdAt: number;
 }
 
-export interface PersonalizationHints {
-  preferredKeywords: string[];
-  memoHighlights: string[];
-  referencePhrases: string[];
-}
+export const STORAGE_KEYS = {
+  INGREDIENTS: "fridge-writer-ingredients",
+  PROMPT: "fridge-writer-prompt",
+  COOK_MODE: "fridge-writer-cookmode",
+  WRITING_STYLE: "fridge-writer-writingstyle",
+  COOK_RESULT: "fridge-writer-cookresult",
+  ACTIVE_SESSION: "fridge-writer-active-session",
+  INGREDIENT_LIBRARY: "fridge-writer-ingredient-library",
+  MEMOS: "fridge-writer-memos",
+  COOKBOOK: "fridge-writer-cookbook",
+} as const;
 
 export interface CookbookEntry {
   id: string;
@@ -199,40 +198,40 @@ const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [ingredients, setIngredients] = useState<Ingredient[]>(() => {
-    const saved = readLS<Ingredient[]>("fridge-writer-ingredients", []);
+    const saved = readLS<Ingredient[]>(STORAGE_KEYS.INGREDIENTS, []);
     return saved.length > 0 ? saved : DEFAULT_INGREDIENTS;
   });
 
   const [ingredientLibrary, setIngredientLibrary] = useState<string[]>(() => {
-    const saved = readLS<string[]>("fridge-writer-ingredient-library", []);
+    const saved = readLS<string[]>(STORAGE_KEYS.INGREDIENT_LIBRARY, []);
     if (saved.length > 0) return saved;
     return DEFAULT_INGREDIENTS.map((i) => i.text);
   });
 
   const [prompt, setPromptState] = useState<string>(() =>
-    readLS<string>("fridge-writer-prompt", "")
+    readLS<string>(STORAGE_KEYS.PROMPT, "")
   );
 
   const [cookMode, setCookModeState] = useState<CookMode>(() =>
-    normalizeCookMode(readLS<unknown>("fridge-writer-cookmode", "mealkit"))
+    normalizeCookMode(readLS<unknown>(STORAGE_KEYS.COOK_MODE, "mealkit"))
   );
 
   const [writingStyle, setWritingStyleState] = useState<WritingStyle>(() =>
-    normalizeWritingStyle(readLS<unknown>("fridge-writer-writingstyle", "balanced"))
+    normalizeWritingStyle(readLS<unknown>(STORAGE_KEYS.WRITING_STYLE, "balanced"))
   );
 
   const [cookResult, setCookResultState] = useState<CookResult | null>(() =>
-    readLS<CookResult | null>("fridge-writer-cookresult", null)
+    readLS<CookResult | null>(STORAGE_KEYS.COOK_RESULT, null)
   );
 
   const [activeSession, setActiveSession] = useState<CookSessionSnapshot | null>(() =>
-    readLS<CookSessionSnapshot | null>("fridge-writer-active-session", null)
+    readLS<CookSessionSnapshot | null>(STORAGE_KEYS.ACTIVE_SESSION, null)
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [memos, setMemos] = useState<Memo[]>(() => readLS<Memo[]>("fridge-writer-memos", []));
+  const [memos, setMemos] = useState<Memo[]>(() => readLS<Memo[]>(STORAGE_KEYS.MEMOS, []));
   const [cookbook, setCookbook] = useState<CookbookEntry[]>(() =>
-    readLS<CookbookEntry[]>("fridge-writer-cookbook", [])
+    readLS<CookbookEntry[]>(STORAGE_KEYS.COOKBOOK, [])
   );
 
   const personalizationHints = useMemo(
@@ -241,39 +240,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    writeLS("fridge-writer-ingredients", ingredients);
+    writeLS(STORAGE_KEYS.INGREDIENTS, ingredients);
   }, [ingredients]);
 
   useEffect(() => {
-    writeLS("fridge-writer-ingredient-library", ingredientLibrary);
+    writeLS(STORAGE_KEYS.INGREDIENT_LIBRARY, ingredientLibrary);
   }, [ingredientLibrary]);
 
   useEffect(() => {
-    writeLS("fridge-writer-prompt", prompt);
+    writeLS(STORAGE_KEYS.PROMPT, prompt);
   }, [prompt]);
 
   useEffect(() => {
-    writeLS("fridge-writer-cookmode", cookMode);
+    writeLS(STORAGE_KEYS.COOK_MODE, cookMode);
   }, [cookMode]);
 
   useEffect(() => {
-    writeLS("fridge-writer-writingstyle", writingStyle);
+    writeLS(STORAGE_KEYS.WRITING_STYLE, writingStyle);
   }, [writingStyle]);
 
   useEffect(() => {
-    writeLS("fridge-writer-cookresult", cookResult);
+    writeLS(STORAGE_KEYS.COOK_RESULT, cookResult);
   }, [cookResult]);
 
   useEffect(() => {
-    writeLS("fridge-writer-active-session", activeSession);
+    writeLS(STORAGE_KEYS.ACTIVE_SESSION, activeSession);
   }, [activeSession]);
 
   useEffect(() => {
-    writeLS("fridge-writer-memos", memos);
+    writeLS(STORAGE_KEYS.MEMOS, memos);
   }, [memos]);
 
   useEffect(() => {
-    writeLS("fridge-writer-cookbook", cookbook);
+    writeLS(STORAGE_KEYS.COOKBOOK, cookbook);
   }, [cookbook]);
 
   const ensureLibrary = useCallback((text: string) => {
@@ -376,6 +375,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setCookResultState((currentResult) => {
       if (!currentResult) return currentResult;
       setCookbook((prev) => {
+        // `activeSession` stays current because this callback depends on it.
         const snapshot = activeSession;
         return [
           {
